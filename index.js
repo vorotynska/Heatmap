@@ -1,6 +1,6 @@
 const url = 'https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/global-temperature.json';
 const margin = {
-    top: 50,
+    top: 80,
     right: 20,
     bottom: 70,
     left: 70
@@ -9,11 +9,18 @@ const margin = {
 const width = 1200 - margin.left - margin.right;
 const height = 600 - margin.top - margin.bottom;
 
+const colors = ['#012840', '#2F5973', '#6595BF',
+    '#91B7D9', '#CEDEF2', '#F2955E',
+    '#A65221', '#4F7302', '#274001', '#F20544'
+]
+
+
 const svg = d3.select("body").append("svg")
     .attr("class", "axis")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
+    .style('font-size', '14px')
     .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
 
@@ -33,8 +40,9 @@ req.onload = () => {
         // d.year = +d.year;
         d.year = parseTime(new Date(d.year, 0));
         d.variance = d.variance;
-
     });
+
+
 
     const xScale = d3.scaleBand()
         .range([0, width])
@@ -71,7 +79,11 @@ req.onload = () => {
         .interpolator(d3.interpolateInferno)
         .domain([1, 100]);
 
-
+    const min = d3.min(data.monthlyVariance.map(d => d.variance));
+    const max = d3.max(data.monthlyVariance.map(d => d.variance));
+    const colorScale = d3.scaleQuantile()
+        .domain([min + 8.66, max + 8.66])
+        .range(colors);
 
     const tooltip = d3.select("body")
         .append("div")
@@ -109,13 +121,13 @@ req.onload = () => {
             .style("opacity", 0.8)
     }
 
-    const color = d3.scaleOrdinal()
-        .range(d3.schemeCategory10
-            .map(function (c) {
-                c = d3.rgb(c);
-                c.opacity = 0.7;
-                return c;
-            }));
+    /* const color = d3.scaleOrdinal()
+         .range(d3.schemeCategory10
+             .map(function (c) {
+                 c = d3.rgb(c);
+                 c.opacity = 0.7;
+                 return c;
+             }));*/
 
     const baseTemp = 8.66
 
@@ -136,7 +148,7 @@ req.onload = () => {
         .attr("width", xScale.bandwidth())
         .attr("height", yScale.bandwidth())
         .style("fill", function (d) {
-            return color(d.variance)
+            return colorScale(d.variance + baseTemp);
 
         })
         .attr("data-month", (d) => monthNames.indexOf(d.month))
@@ -153,19 +165,51 @@ req.onload = () => {
     svg.append("text")
         .attr('id', 'title')
         .attr("x", 0)
-        .attr("y", -20)
+        .attr("y", -45)
         .attr("text-anchor", "center")
-        .style("font-size", "22px")
+        .style("font-size", "30px")
         .text("Monthly Global Land-Surface Temperature");
 
     svg.append("text")
         .attr('id', 'description')
         .attr("x", 0)
-        .attr("y", 0)
+        .attr("y", -15)
         .attr("text-anchor", "left")
-        .style("font-size", "14px")
+        .style("font-size", "20px")
         .style("fill", "grey")
         .text("1753 - 2015: base temperature 8.66℃");
+
+    //LEGEND
+    const leg = [0, 2.8, 4, 5.1, 6.2, 7.3, 8.4, 9.5, 10.6, 11.7, 12.8];
+    var rectWidth = 40;
+
+    const legendTable = d3.select('svg')
+
+
+
+    const legend = legendTable.selectAll('.legend')
+        .data()
+        .enter().append('g')
+        .attr('class', "legend")
+        .attr('i', "legend")
+
+
+    legend.append('rect')
+        .attr("x", (d, i) => margin.left + (rectWidth * i))
+        .attr("y", function (d, i) {
+            return height + 100;
+        })
+        .attr("width", rectWidth)
+        .attr("height", 20)
+        .style("fill", (d) => colorScale(d));
+
+    legend.append('text')
+        .attr("x", (d, i) => margin.left + (rectWidth * i))
+        .attr("y", function (d, i) {
+            return height + 135;
+        })
+        .text((d) => d.toString())
+
 
 }
 req.send()

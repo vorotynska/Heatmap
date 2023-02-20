@@ -1,12 +1,28 @@
 body{
     height: 100vh;
+    background-color: #261A0B;
+    
+    display: flex;
+    justify-items: center;
+    align-items: center;
 }
 
 svg {
-    background-color: wheat;
+    background-color: white;
    max-height: 100%;
+   border-radius: 10px;
+   margin: auto;
+   z-index: 3;
 }
  #tooltip {
     z-index: 10;
     position: absolute;
+ }
+ h1 {
+    color: #ff0000 ;
+ }
+ #title {
+    color: #780D1D;
+    font-weight: bold;
+    
  }
