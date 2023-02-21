@@ -18,9 +18,7 @@ svg {
     z-index: 10;
     position: absolute;
  }
- h1 {
-    color: #ff0000 ;
- }
+
  #title {
     color: #780D1D;
     font-weight: bold;

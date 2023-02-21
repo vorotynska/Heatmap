@@ -97,7 +97,7 @@ req.onload = () => {
         .style("padding", "5px")
 
 
-    const mouseover = function (event, d) {
+    const mouseover = function (e, d) {
         tooltip
             .style("opacity", 1)
         d3.select(this)
@@ -105,15 +105,17 @@ req.onload = () => {
             .style("opacity", 1)
     }
 
-    const mousemove = function (event, d) {
+    const mousemove = function (e, d) {
         tooltip
-            .html("The exact value of<br>this cell is: " + d.variance)
-            .style("left", (event.xScale) / 2 + "px")
-            .style("top", (event.yScale) / 2 + "px")
+            .html("<b>" + d.year + "</b>" +
+                "<br>" + (baseTemp + d.variance).toFixed(3) + " °C" +
+                "<br>" + d.variance.toFixed(3) + " °C")
+            .style("left", (e.xScale) / 2 + "px")
+            .style("top", (e.yScale) / 2 + "px")
             .attr("data-year", d.year)
     }
 
-    const mouseleave = function (event, d) {
+    const mouseleave = function (e, d) {
         tooltip
             .style("opacity", 0)
         d3.select(this)
@@ -121,13 +123,7 @@ req.onload = () => {
             .style("opacity", 0.8)
     }
 
-    /* const color = d3.scaleOrdinal()
-         .range(d3.schemeCategory10
-             .map(function (c) {
-                 c = d3.rgb(c);
-                 c.opacity = 0.7;
-                 return c;
-             }));*/
+
 
     const baseTemp = 8.66
 
@@ -181,17 +177,16 @@ req.onload = () => {
 
     //LEGEND
     const leg = [0, 2.8, 4, 5.1, 6.2, 7.3, 8.4, 9.5, 10.6, 11.7, 12.8];
-    var rectWidth = 40;
 
     const legendTable = d3.select('svg')
 
-
+    const rectWidth = 30
 
     const legend = legendTable.selectAll('.legend')
-        .data()
+        .data(leg)
         .enter().append('g')
         .attr('class', "legend")
-        .attr('i', "legend")
+        .attr('id', "legend")
 
 
     legend.append('rect')
@@ -201,7 +196,9 @@ req.onload = () => {
         })
         .attr("width", rectWidth)
         .attr("height", 20)
-        .style("fill", (d) => colorScale(d));
+        .style("fill", (d) => {
+            return colorScale(d)
+        });
 
     legend.append('text')
         .attr("x", (d, i) => margin.left + (rectWidth * i))
